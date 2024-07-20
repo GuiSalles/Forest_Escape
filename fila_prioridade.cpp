@@ -1,8 +1,6 @@
 #include "fila_prioridade.hpp"
 #include <cmath>
 
-const double FilaPrioridade::INFINITO = 1e+30;
-
 FilaPrioridade::FilaPrioridade(int tamanho) : tamanho(tamanho), tamanhoAtual(0) {
     prioridades = new double[tamanho];
     vertices = new int[tamanho];
