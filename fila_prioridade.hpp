@@ -16,7 +16,7 @@ private:
     int* posicao;
     int tamanho;
     int tamanhoAtual;
-    static const double INFINITO;
+    static const double INFINITO = 10000000;
 
     void heapifyUp(int index);
     void heapifyDown(int index);
