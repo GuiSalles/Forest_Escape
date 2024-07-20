@@ -39,12 +39,12 @@ void Grafo::inserePortal(int v1, int v2) {
     insereAresta(v2, v1, 0);
 }
 
-double Grafo::calculaDistancia(int u, int v) {
+double Grafo::calculaDistancia(int u, int v) const {
     int x1 = coordenadas[u].x;
     int y1 = coordenadas[u].y;
     int x2 = coordenadas[v].x;
     int y2 = coordenadas[v].y;
-    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+    return std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
 }
 
 int Grafo::quantidadeVertices() const {

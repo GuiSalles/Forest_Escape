@@ -1,13 +1,13 @@
-#ifndef ALGA_HPP
-#define ALGA_HPP
+#ifndef DIJKSTRA_HPP
+#define DIJKSTRA_HPP
 
 #include "grafo.hpp"
 #include "fila_prioridade.hpp"
 
-class AStar {
+class Dijkstra {
 public:
-    AStar(const Grafo& g);
-    ~AStar();
+    Dijkstra(const Grafo& g);
+    ~Dijkstra();
     void calculaCaminho(int origem, int destino);
     int getDistancia(int destino) const;
     void getCaminho(int destino, int* caminho, int& tamCaminho) const;
@@ -18,11 +18,10 @@ private:
     int* prev;
     bool* visitado;
     int nVertices;
-    static const int INFINITO = 1000000;
     FilaPrioridade fila;
+    static const int INFINITO;
 
-    double heuristica(int v, int destino) const;
     void inicializa(int origem);
 };
 
-#endif ALGA_HPP
+#endif // DIJKSTRA_HPP

@@ -17,7 +17,7 @@ public:
     void insereAresta(int u, int v, int peso);
     void insereVertice(int vertice, int x, int y);
     void inserePortal(int v1, int v2);
-    double calculaDistancia(int u, int v);
+    double calculaDistancia(int u, int v) const;
     int quantidadeVertices() const;
 
     friend class Dijkstra;
@@ -33,4 +33,4 @@ private:
     }* coordenadas;
 };
 
-#endif GRAFO_HPP
+#endif // GRAFO_HPP

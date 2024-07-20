@@ -1,5 +1,7 @@
 #include "dijkstra.hpp"
 
+const int Dijkstra::INFINITO = 2147483647;
+
 Dijkstra::Dijkstra(const Grafo& g) : grafo(g), fila(g.quantidadeVertices()) {
     nVertices = grafo.quantidadeVertices();
     dist = new int[nVertices];

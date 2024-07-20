@@ -16,10 +16,11 @@ private:
     int* posicao;
     int tamanho;
     int tamanhoAtual;
-    static const double INFINITO = 10000000;
 
     void heapifyUp(int index);
     void heapifyDown(int index);
+
+    static const double INFINITO;
 };
 
-#endif FILA_PRIORIDADE_HPP
+#endif // FILA_PRIORIDADE_HPP

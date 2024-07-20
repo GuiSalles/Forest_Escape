@@ -1,5 +1,7 @@
 #include "fila_prioridade.hpp"
-#include <cmath>
+#include <algorithm>
+
+const double FilaPrioridade::INFINITO = 1e10;
 
 FilaPrioridade::FilaPrioridade(int tamanho) : tamanho(tamanho), tamanhoAtual(0) {
     prioridades = new double[tamanho];

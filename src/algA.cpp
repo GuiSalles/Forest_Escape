@@ -1,7 +1,9 @@
 #include "algA.hpp"
 #include <cmath>
 
-AStar::AStar(const Grafo& g) : grafo(g), fila(g.quantidadeVertices()) {
+const double AStar::INFINITO = 1e10;
+
+AStar::AStar(const Grafo& g, int maxPortais) : grafo(g), maxPortais(maxPortais), fila(g.quantidadeVertices()) { // Inicializando a fila
     nVertices = grafo.quantidadeVertices();
     dist = new int[nVertices];
     prev = new int[nVertices];
@@ -16,7 +18,7 @@ AStar::~AStar() {
 
 void AStar::inicializa(int origem) {
     for (int i = 0; i < nVertices; i++) {
-        dist[i] = INFINITO;
+        dist[i] = static_cast<int>(INFINITO);
         prev[i] = -1;
         visitado[i] = false;
     }
@@ -37,7 +39,7 @@ void AStar::calculaCaminho(int origem, int destino) {
             int v = adj->rotulo;
             int peso = adj->peso;
 
-            if (!visitado[v] && dist[u] != INFINITO && dist[u] + peso < dist[v]) {
+            if (!visitado[v] && dist[u] != static_cast<int>(INFINITO) && dist[u] + peso < dist[v]) {
                 dist[v] = dist[u] + peso;
                 prev[v] = u;
                 fila.atualizarPrioridade(v, dist[v] + heuristica(v, destino));
