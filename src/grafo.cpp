@@ -36,7 +36,6 @@ void Grafo::insereVertice(int vertice, int x, int y) {
 
 void Grafo::inserePortal(int v1, int v2) {
     insereAresta(v1, v2, 0);
-    insereAresta(v2, v1, 0);
 }
 
 double Grafo::calculaDistancia(int u, int v) const {

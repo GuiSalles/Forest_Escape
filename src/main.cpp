@@ -43,7 +43,7 @@ int main() {
         caminhoDijkstra = true;
     }
 
-    aStar.inicializa(origem);
+    aStar.calculaCaminho(origem, destino); 
     if (aStar.getDistancia(destino) <= s) {
         caminhoAStar = true;
     }

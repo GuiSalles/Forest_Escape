@@ -3,7 +3,7 @@
 
 const double AStar::INFINITO = 1e10;
 
-AStar::AStar(const Grafo& g, int maxPortais) : grafo(g), maxPortais(maxPortais), fila(g.quantidadeVertices()) { // Inicializando a fila
+AStar::AStar(const Grafo& g, int maxPortais) : grafo(g), maxPortais(maxPortais), fila(g.quantidadeVertices()) {
     nVertices = grafo.quantidadeVertices();
     dist = new int[nVertices];
     prev = new int[nVertices];

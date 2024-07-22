@@ -6,7 +6,7 @@
 
 class AStar {
 public:
-    AStar(const Grafo& g, int maxPortais); // Adicione o parâmetro maxPortais
+    AStar(const Grafo& g, int maxPortais);
     ~AStar();
     void calculaCaminho(int origem, int destino);
     int getDistancia(int destino) const;
