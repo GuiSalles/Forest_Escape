@@ -6,31 +6,33 @@
 
 struct No {
     int rotulo;
-    int peso;
+    double peso;
     No* prox;
+    bool ehPortal;
+};
+
+struct Coordenada {
+    double x;
+    double y;
 };
 
 class Grafo {
 public:
-    Grafo(int numVertices);
+    Grafo(int nVertices);
     ~Grafo();
-    void insereAresta(int u, int v, int peso);
-    void insereVertice(int vertice, int x, int y);
-    void inserePortal(int v1, int v2);
+    void insereAresta(int u, int v, double peso, bool ehPortal);
+    void inserePortal(int u, int v);
+    void insereCoordenada(int u, double x, double y);
     double calculaDistancia(int u, int v) const;
     int quantidadeVertices() const;
-
-    friend class Dijkstra;
-    friend class AStar;
+    int tamanho() const;
+    No* obterListaAdj(int u) const;
+    Coordenada obterCoordenada(int v) const;
 
 private:
     int nVertices;
-    int nArestas;
     No** listaAdj;
-    struct Coordenada {
-        int x;
-        int y;
-    }* coordenadas;
+    Coordenada* coordenadas;
 };
 
 #endif // GRAFO_HPP

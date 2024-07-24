@@ -1,66 +1,57 @@
 #include "dijkstra.hpp"
+#include "fila_de_prioridade.hpp"
+#include "grafo.hpp"
+#include <limits>
+#include <cmath>
 
-const int Dijkstra::INFINITO = 2147483647;
+bool dijkstra(const Grafo &grafo, int origem, int destino, double energia, int maxPortaisUsaveis) {
+    int n = grafo.quantidadeVertices();
+    int numEstados = n * (maxPortaisUsaveis + 1);
+    
+    double* distancias = new double[numEstados];
+    int* portaisUsados = new int[numEstados];
 
-Dijkstra::Dijkstra(const Grafo& g) : grafo(g), fila(g.quantidadeVertices()) {
-    nVertices = grafo.quantidadeVertices();
-    dist = new int[nVertices];
-    prev = new int[nVertices];
-    visitado = new bool[nVertices];
-}
-
-Dijkstra::~Dijkstra() {
-    delete[] dist;
-    delete[] prev;
-    delete[] visitado;
-}
-
-void Dijkstra::inicializa(int origem) {
-    for (int i = 0; i < nVertices; i++) {
-        dist[i] = INFINITO;
-        prev[i] = -1;
-        visitado[i] = false;
+    for (int i = 0; i < numEstados; ++i) {
+        distancias[i] = std::numeric_limits<double>::infinity();
+        portaisUsados[i] = maxPortaisUsaveis + 1;
     }
-    dist[origem] = 0;
-    fila.inserir(origem, 0);
-}
 
-void Dijkstra::calculaCaminho(int origem, int destino) {
-    inicializa(origem);
+    fila_de_prioridade<std::pair<double, std::pair<int, int>>> fila(numEstados);
+    distancias[origem * (maxPortaisUsaveis + 1)] = 0.0;
+    portaisUsados[origem * (maxPortaisUsaveis + 1)] = 0;
+    fila.inserir({0.0, {origem, 0}});
 
     while (!fila.vazia()) {
-        int u = fila.extrairMin();
-        if (u == destino) break;
+        auto item = fila.remover();
+        double custoAtual = item.first;
+        int u = item.second.first;
+        int portaisUsadosAtual = item.second.second;
 
-        visitado[u] = true;
-        No* adj = grafo.listaAdj[u];
-        while (adj != nullptr) {
+        if (u == destino) {
+            delete[] distancias;
+            delete[] portaisUsados;
+            return custoAtual <= energia;
+        }
+
+        No* adj = grafo.obterListaAdj(u);
+        while (adj) {
             int v = adj->rotulo;
-            int peso = adj->peso;
+            double peso = adj->peso;
+            bool ehPortal = adj->ehPortal;
+            int proximoPortaisUsados = portaisUsadosAtual + (ehPortal ? 1 : 0);
 
-            if (!visitado[v] && dist[u] != INFINITO && dist[u] + peso < dist[v]) {
-                dist[v] = dist[u] + peso;
-                prev[v] = u;
-                fila.atualizarPrioridade(v, dist[v]);
+            if (proximoPortaisUsados <= maxPortaisUsaveis &&
+                distancias[u * (maxPortaisUsaveis + 1) + portaisUsadosAtual] + peso < distancias[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados]) {
+                distancias[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados] = distancias[u * (maxPortaisUsaveis + 1) + portaisUsadosAtual] + peso;
+                portaisUsados[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados] = proximoPortaisUsados;
+                fila.inserir({distancias[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados], {v, proximoPortaisUsados}});
             }
+
             adj = adj->prox;
         }
     }
-}
 
-int Dijkstra::getDistancia(int destino) const {
-    return dist[destino];
-}
-
-void Dijkstra::getCaminho(int destino, int* caminho, int& tamCaminho) const {
-    tamCaminho = 0;
-    for (int v = destino; v != -1; v = prev[v]) {
-        caminho[tamCaminho++] = v;
-    }
-
-    for (int i = 0; i < tamCaminho / 2; i++) {
-        int temp = caminho[i];
-        caminho[i] = caminho[tamCaminho - 1 - i];
-        caminho[tamCaminho - 1 - i] = temp;
-    }
+    delete[] distancias;
+    delete[] portaisUsados;
+    return false;
 }

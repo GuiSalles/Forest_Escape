@@ -1,51 +1,53 @@
 #include "grafo.hpp"
 
-Grafo::Grafo(int numVertices) {
-    nVertices = numVertices;
-    nArestas = 0;
+Grafo::Grafo(int nVertices) : nVertices(nVertices) {
     listaAdj = new No*[nVertices];
     coordenadas = new Coordenada[nVertices];
-
-    for (int i = 0; i < nVertices; i++) {
+    for (int i = 0; i < nVertices; ++i) {
         listaAdj[i] = nullptr;
     }
 }
 
 Grafo::~Grafo() {
-    for (int i = 0; i < nVertices; i++) {
+    for (int i = 0; i < nVertices; ++i) {
         No* atual = listaAdj[i];
-        while (atual != nullptr) {
-            No* aux = atual;
+        while (atual) {
+            No* temp = atual;
             atual = atual->prox;
-            delete aux;
+            delete temp;
         }
     }
     delete[] listaAdj;
     delete[] coordenadas;
 }
 
-void Grafo::insereAresta(int u, int v, int peso) {
-    No* newNo = new No{v, peso, listaAdj[u]};
-    listaAdj[u] = newNo;
-    nArestas++;
+void Grafo::insereAresta(int u, int v, double peso, bool ehPortal) {
+    No* novaAresta = new No{v, peso, listaAdj[u], ehPortal};
+    listaAdj[u] = novaAresta;
 }
 
-void Grafo::insereVertice(int vertice, int x, int y) {
-    coordenadas[vertice] = Coordenada{x, y};
+void Grafo::inserePortal(int u, int v) {
+    insereAresta(u, v, 0.0, true);
 }
 
-void Grafo::inserePortal(int v1, int v2) {
-    insereAresta(v1, v2, 0);
+void Grafo::insereCoordenada(int u, double x, double y) {
+    coordenadas[u] = Coordenada{x, y};
 }
 
 double Grafo::calculaDistancia(int u, int v) const {
-    int x1 = coordenadas[u].x;
-    int y1 = coordenadas[u].y;
-    int x2 = coordenadas[v].x;
-    int y2 = coordenadas[v].y;
-    return std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
+    double dx = coordenadas[u].x - coordenadas[v].x;
+    double dy = coordenadas[u].y - coordenadas[v].y;
+    return std::sqrt(dx * dx + dy * dy);
 }
 
 int Grafo::quantidadeVertices() const {
     return nVertices;
+}
+
+No* Grafo::obterListaAdj(int u) const {
+    return listaAdj[u];
+}
+
+Coordenada Grafo::obterCoordenada(int v) const {
+    return coordenadas[v];
 }
