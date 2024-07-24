@@ -1,6 +1,7 @@
 #include <iostream>
-#include "algA.hpp"
+#include <sstream>
 #include "dijkstra.hpp"
+#include "algA.hpp"
 #include "grafo.hpp"
 
 int main() {
@@ -8,47 +9,34 @@ int main() {
     std::cin >> n >> m >> k;
 
     Grafo grafo(n);
-    for (int i = 0; i < n; i++) {
-        int x, y;
+
+    for (int i = 0; i < n; ++i) {
+        double x, y;
         std::cin >> x >> y;
-        grafo.insereVertice(i, x, y);
+        grafo.insereCoordenada(i, x, y);
     }
 
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < m; ++i) {
         int u, v;
         std::cin >> u >> v;
-        grafo.insereAresta(u, v, 1);
+        double peso = grafo.calculaDistancia(u, v);
+        grafo.insereAresta(u, v, peso, false);
     }
 
-    for (int i = 0; i < k; i++) {
+    for (int i = 0; i < k; ++i) {
         int u, v;
         std::cin >> u >> v;
         grafo.inserePortal(u, v);
     }
 
-    double s;
-    int q;
+    int s, q;
     std::cin >> s >> q;
 
-    AStar aStar(grafo, q);
-    Dijkstra dijkstra(grafo);
+    bool resultadoDijkstra = dijkstra(grafo, 0, n - 1, s, q);
+    std::cout << (resultadoDijkstra ? 1 : 0) << " ";
 
-    bool caminhoDijkstra = false;
-    bool caminhoAStar = false;
-
-    int origem = 0;
-    int destino = n - 1;
-    dijkstra.calculaCaminho(origem, destino);
-    if (dijkstra.getDistancia(destino) <= s) {
-        caminhoDijkstra = true;
-    }
-
-    aStar.inicializa(origem);
-    if (aStar.getDistancia(destino) <= s) {
-        caminhoAStar = true;
-    }
-
-    std::cout << (caminhoDijkstra ? 1 : 0) << " " << (caminhoAStar ? 1 : 0) << std::endl;
+    bool resultadoAStar = algA(grafo, 0, n - 1, s, q);
+    std::cout << (resultadoAStar ? 1 : 0);
 
     return 0;
 }
