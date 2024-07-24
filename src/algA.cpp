@@ -1,75 +1,62 @@
 #include "algA.hpp"
+#include "fila_de_prioridade.hpp"
+#include "grafo.hpp"
+#include <limits>
 #include <cmath>
 
-const double AStar::INFINITO = 1e10;
+bool algA(const Grafo &grafo, int origem, int destino, double energia, int maxPortaisUsaveis) {
+    int n = grafo.quantidadeVertices();
+    int numEstados = n * (maxPortaisUsaveis + 1);
 
-AStar::AStar(const Grafo& g, int maxPortais) : grafo(g), maxPortais(maxPortais), fila(g.quantidadeVertices()) { // Inicializando a fila
-    nVertices = grafo.quantidadeVertices();
-    dist = new int[nVertices];
-    prev = new int[nVertices];
-    visitado = new bool[nVertices];
-}
+    double* distancias = new double[numEstados];
+    double* heuristicas = new double[numEstados];
+    int* portaisUsados = new int[numEstados];
 
-AStar::~AStar() {
-    delete[] dist;
-    delete[] prev;
-    delete[] visitado;
-}
-
-void AStar::inicializa(int origem) {
-    for (int i = 0; i < nVertices; i++) {
-        dist[i] = static_cast<int>(INFINITO);
-        prev[i] = -1;
-        visitado[i] = false;
+    for (int i = 0; i < numEstados; ++i) {
+        distancias[i] = std::numeric_limits<double>::infinity();
+        heuristicas[i] = std::numeric_limits<double>::infinity();
+        portaisUsados[i] = maxPortaisUsaveis + 1;
     }
-    dist[origem] = 0;
-    fila.inserir(origem, 0);
-}
 
-void AStar::calculaCaminho(int origem, int destino) {
-    inicializa(origem);
+    fila_de_prioridade<std::pair<double, std::pair<int, int>>> fila(numEstados);
+    distancias[origem * (maxPortaisUsaveis + 1)] = 0.0;
+    heuristicas[origem * (maxPortaisUsaveis + 1)] = grafo.calculaDistancia(origem, destino);
+    portaisUsados[origem * (maxPortaisUsaveis + 1)] = 0;
+    fila.inserir({0.0 + heuristicas[origem * (maxPortaisUsaveis + 1)], {origem, 0}});
 
     while (!fila.vazia()) {
-        int u = fila.extrairMin();
-        if (u == destino) break;
+        auto item = fila.remover();
+        int u = item.second.first;
+        int portaisUsadosAtual = item.second.second;
 
-        visitado[u] = true;
-        No* adj = grafo.listaAdj[u];
-        while (adj != nullptr) {
+        if (u == destino) {
+            delete[] distancias;
+            delete[] heuristicas;
+            delete[] portaisUsados;
+            return distancias[destino * (maxPortaisUsaveis + 1) + portaisUsadosAtual] <= energia;
+        }
+
+        No* adj = grafo.obterListaAdj(u);
+        while (adj) {
             int v = adj->rotulo;
-            int peso = adj->peso;
+            double peso = adj->peso;
+            bool ehPortal = adj->ehPortal;
+            int proximoPortaisUsados = portaisUsadosAtual + (ehPortal ? 1 : 0);
 
-            if (!visitado[v] && dist[u] != static_cast<int>(INFINITO) && dist[u] + peso < dist[v]) {
-                dist[v] = dist[u] + peso;
-                prev[v] = u;
-                fila.atualizarPrioridade(v, dist[v] + heuristica(v, destino));
+            if (proximoPortaisUsados <= maxPortaisUsaveis &&
+                distancias[u * (maxPortaisUsaveis + 1) + portaisUsadosAtual] + peso < distancias[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados]) {
+                distancias[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados] = distancias[u * (maxPortaisUsaveis + 1) + portaisUsadosAtual] + peso;
+                heuristicas[v * (maxPortaisUsaveis + 1)] = grafo.calculaDistancia(v, destino);
+                portaisUsados[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados] = proximoPortaisUsados;
+                fila.inserir({distancias[v * (maxPortaisUsaveis + 1) + proximoPortaisUsados] + heuristicas[v * (maxPortaisUsaveis + 1)], {v, proximoPortaisUsados}});
             }
+
             adj = adj->prox;
         }
     }
-}
 
-double AStar::heuristica(int v, int destino) const {
-    int x1 = grafo.coordenadas[v].x;
-    int y1 = grafo.coordenadas[v].y;
-    int x2 = grafo.coordenadas[destino].x;
-    int y2 = grafo.coordenadas[destino].y;
-    return std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
-}
-
-int AStar::getDistancia(int destino) const {
-    return dist[destino];
-}
-
-void AStar::getCaminho(int destino, int* caminho, int& tamCaminho) const {
-    tamCaminho = 0;
-    for (int v = destino; v != -1; v = prev[v]) {
-        caminho[tamCaminho++] = v;
-    }
-
-    for (int i = 0; i < tamCaminho / 2; i++) {
-        int temp = caminho[i];
-        caminho[i] = caminho[tamCaminho - 1 - i];
-        caminho[tamCaminho - 1 - i] = temp;
-    }
+    delete[] distancias;
+    delete[] heuristicas;
+    delete[] portaisUsados;
+    return false;
 }
